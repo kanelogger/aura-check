@@ -10,6 +10,8 @@ import Stats from './pages/Stats';
 import CheckIn from './pages/CheckIn';
 import Profile from './pages/Profile';
 import Discover from './pages/Discover';
+import AIChat from './pages/AIChat';
+
 
 const pageTransition = {
   initial: { scale: 0.96, opacity: 0 },
@@ -50,6 +52,8 @@ function AnimatedRoutes() {
           <Route path="/stats" element={<Stats />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/ai-chat" element={<AIChat />} />
+
         </Routes>
       </motion.div>
     </AnimatePresence>

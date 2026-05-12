@@ -1,4 +1,4 @@
-# Technical Specification: Aura Check ✨
+# Technical Specification: hdhd 自律打卡
 
 ## Dependencies
 

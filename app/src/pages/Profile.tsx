@@ -22,7 +22,7 @@ const itemVariants = {
 const SETTINGS = [
   { icon: Bell, color: 'var(--accent-salmon)', label: '打卡提醒', hasToggle: true },
   { icon: ShareNetwork, color: 'var(--accent-mint-deep)', label: '邀请好友', hasToggle: false },
-  { icon: Info, color: 'var(--text-tertiary)', label: '关于 hdhd', hasToggle: false },
+  { icon: Info, color: 'var(--text-tertiary)', label: '关于 翻起来吧', hasToggle: false },
 ];
 
 export default function Profile() {
@@ -88,7 +88,7 @@ export default function Profile() {
                   } else if (item.label === '邀请好友') {
                     showToast('邀请链接已复制 📋');
                   } else {
-                    showToast('燃起来了！v2.0 🎉');
+                    showToast('翻起来吧 v3.0 🎉');
                   }
                 }}
               >
