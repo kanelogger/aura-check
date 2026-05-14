@@ -26,3 +26,4 @@ dist-ssr
 # OS files
 Thumbs.db
 db.json
+.env.md
