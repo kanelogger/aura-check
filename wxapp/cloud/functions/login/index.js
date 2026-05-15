@@ -4,17 +4,28 @@ const db = cloud.database()
 
 exports.main = async (event, context) => {
   const { OPENID } = cloud.getWXContext()
+  const { code, nickName, avatarUrl } = event
 
   const { data } = await db.collection('users').where({ openid: OPENID }).get()
 
   if (data.length > 0) {
-    return { success: true, user: data[0], isNewUser: false }
+    const user = data[0]
+    const updateData = {}
+    if (nickName) updateData.nickName = nickName
+    if (avatarUrl) updateData.avatarUrl = avatarUrl
+    updateData.updatedAt = db.serverDate()
+
+    if (Object.keys(updateData).length > 1) {
+      await db.collection('users').doc(user._id).update({ data: updateData })
+      return { success: true, user: { ...user, ...updateData }, isNewUser: false }
+    }
+    return { success: true, user, isNewUser: false }
   }
 
   const newUser = {
     openid: OPENID,
-    nickName: '微信用户',
-    avatarUrl: `https://api.dicebear.com/9.x/avataaars/svg?seed=${OPENID}&size=80`,
+    nickName: nickName || '微信用户',
+    avatarUrl: avatarUrl || `https://api.dicebear.com/9.x/avataaars/svg?seed=${OPENID}&size=80`,
     streakDays: 0,
     totalCheckIns: 0,
     weeklyFitnessDone: 0,

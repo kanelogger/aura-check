@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Taro from '@tarojs/taro'
 import { View, Text, ScrollView } from '@tarojs/components'
 import { useAppStore } from '@/hooks/useAppStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import { Category, EmojiMood, CheckInType } from '@/types'
 import LiquidGlassBg from '@/components/LiquidGlassBg'
 import CategoryPicker from '@/components/CategoryPicker'
@@ -23,6 +24,8 @@ export default function CheckInPage() {
   const [photoUrl, setPhotoUrl] = useState('')
   const [celebrate, setCelebrate] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  useRequireAuth()
 
   const handleSubmit = async () => {
     if (loading) return

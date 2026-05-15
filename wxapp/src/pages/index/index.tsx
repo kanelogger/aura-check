@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { View, Text, ScrollView } from '@tarojs/components'
 import { useAppStore } from '@/hooks/useAppStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import LiquidGlassBg from '@/components/LiquidGlassBg'
 import DateGreeting from '@/components/DateGreeting'
 import WeeklyStrip from '@/components/WeeklyStrip'
@@ -22,6 +23,8 @@ export default function HomePage() {
   useEffect(() => {
     init()
   }, [])
+
+  useRequireAuth()
 
   const handleCheckIn = () => {
     Taro.navigateTo({ url: '/pages/checkin/index' })

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { View, ScrollView } from '@tarojs/components'
 import { useAppStore } from '@/hooks/useAppStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import LiquidGlassBg from '@/components/LiquidGlassBg'
 import CalendarArchive from '@/components/CalendarArchive'
 import MonthlyStats from '@/components/MonthlyStats'
@@ -12,6 +13,8 @@ export default function StatsPage() {
   useEffect(() => {
     init()
   }, [])
+
+  useRequireAuth()
 
   // 简化：用 feed 或本地状态模拟月度数据
   const mockCheckIns = todayCheckIn ? [todayCheckIn] : []

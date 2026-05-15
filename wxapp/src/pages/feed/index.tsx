@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { View, ScrollView } from '@tarojs/components'
 import { useAppStore } from '@/hooks/useAppStore'
+import { useRequireAuth } from '@/hooks/useRequireAuth'
 import LiquidGlassBg from '@/components/LiquidGlassBg'
 import FeedCard from '@/components/FeedCard'
 import Toast from '@/components/Toast'
@@ -14,6 +15,8 @@ export default function FeedPage() {
       loadFeed(1)
     }
   }, [])
+
+  useRequireAuth()
 
   const handleScrollToLower = useCallback(() => {
     if (feedHasMore) {

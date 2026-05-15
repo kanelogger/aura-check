@@ -5,6 +5,7 @@ import { User, CheckIn, FeedItem, Goals, AddCheckInRequest, WeeklyDay } from '@/
 
 interface AppState {
   user: User | null
+  isLoggedIn: boolean
   todayStatus: 'checked' | 'pending'
   todayCheckIn: CheckIn | null
   streakDays: number
@@ -16,6 +17,9 @@ interface AppState {
   toast: { message: string; visible: boolean } | null
 
   init: () => Promise<void>
+  login: (params?: { code?: string; nickName?: string; avatarUrl?: string }) => Promise<void>
+  logout: () => void
+  updateUser: (data: Partial<Pick<User, 'nickName' | 'avatarUrl' | 'mantra'>>) => Promise<void>
   checkIn: (data: AddCheckInRequest) => Promise<any>
   loadFeed: (page?: number) => Promise<void>
   showToast: (message: string) => void
@@ -46,6 +50,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      isLoggedIn: false,
       todayStatus: 'pending',
       todayCheckIn: null,
       streakDays: 0,
@@ -57,6 +62,9 @@ export const useAppStore = create<AppState>()(
       toast: null,
 
       init: async () => {
+        const { isLoggedIn } = get()
+        if (!isLoggedIn) return
+
         try {
           const { result } = await Taro.cloud.callFunction({ name: 'login' })
           if (result && (result as any).success) {
@@ -80,6 +88,66 @@ export const useAppStore = create<AppState>()(
           }
         } catch (e) {
           console.error('getHomeData error', e)
+        }
+      },
+
+      login: async (userInfo = {}) => {
+        const { result } = await Taro.cloud.callFunction({
+          name: 'login',
+          data: userInfo,
+        })
+        const res = result as any
+        if (res && res.success) {
+          set({ user: res.user, isLoggedIn: true })
+          try {
+            const { result: homeResult } = await Taro.cloud.callFunction({ name: 'getHomeData' })
+            const homeRes = homeResult as any
+            if (homeRes) {
+              set({
+                todayStatus: homeRes.todayStatus,
+                todayCheckIn: homeRes.todayCheckIn,
+                streakDays: homeRes.streakDays,
+                goals: homeRes.goals,
+                weeklyStrip: homeRes.weeklyStrip || [],
+              })
+            }
+          } catch (e) {
+            console.error('getHomeData error', e)
+          }
+        } else {
+          throw new Error('登录失败')
+        }
+      },
+
+      logout: () => {
+        set({
+          user: null,
+          isLoggedIn: false,
+          todayStatus: 'pending',
+          todayCheckIn: null,
+          streakDays: 0,
+          goals: null,
+          weeklyStrip: [],
+          feed: [],
+          feedPage: 1,
+          feedHasMore: true,
+          toast: null,
+        })
+        try {
+          Taro.clearStorageSync()
+        } catch {}
+      },
+
+      updateUser: async (data) => {
+        const { result } = await Taro.cloud.callFunction({
+          name: 'updateUser',
+          data,
+        })
+        const res = result as any
+        if (res && res.success) {
+          set({ user: res.user })
+        } else {
+          throw new Error(res?.message || '更新失败')
         }
       },
 
@@ -136,6 +204,7 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => taroStorage),
       partialize: (state) => ({
         user: state.user,
+        isLoggedIn: state.isLoggedIn,
         todayStatus: state.todayStatus,
         todayCheckIn: state.todayCheckIn,
         streakDays: state.streakDays,
@@ -150,6 +219,7 @@ export const useAppStore = create<AppState>()(
           if (!state.goals) state.goals = null
           if (!state.todayCheckIn) state.todayCheckIn = null
           if (!state.streakDays) state.streakDays = 0
+          if (typeof state.isLoggedIn !== 'boolean') state.isLoggedIn = false
         }
       },
     }
