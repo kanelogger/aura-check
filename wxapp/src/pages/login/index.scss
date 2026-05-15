@@ -9,35 +9,36 @@
 }
 
 .login-logo {
-  width: 120px;
-  height: 120px;
-  border-radius: 24px;
-  margin-bottom: 24px;
+  width: 140px;
+  height: 140px;
+  border-radius: 28px;
+  margin-bottom: 28px;
 }
 
 .login-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   color: #1A3C34;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .login-subtitle {
-  font-size: 14px;
+  font-size: 16px;
   color: #9BB5A8;
-  margin-bottom: 60px;
+  margin-bottom: 64px;
 }
 
 .login-btn {
   width: 100%;
-  height: 48px;
-  line-height: 48px;
-  border-radius: 24px;
+  height: 72px;
+  line-height: 72px;
+  border-radius: 28px;
   background: #07C160;
   color: #fff;
-  font-size: 16px;
+  font-size: 34px;
   font-weight: 600;
   border: none;
+  box-shadow: 0 6px 20px rgba(7, 193, 96, 0.35);
 
   &::after {
     border: none;
@@ -46,22 +47,23 @@
 
 .login-fallback {
   width: 100%;
-  height: 48px;
-  border-radius: 24px;
+  height: 56px;
+  border-radius: 28px;
   background: #07C160;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 6px 20px rgba(7, 193, 96, 0.35);
 
   text {
     color: #fff;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
   }
 }
 
 .login-tip {
-  font-size: 12px;
+  font-size: 14px;
   color: #9BB5A8;
-  margin-top: 16px;
+  margin-top: 18px;
 }

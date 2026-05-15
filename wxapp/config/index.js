@@ -39,7 +39,7 @@ const config = {
   framework: 'react',
   compiler: 'webpack5',
   cache: {
-    enable: false // Webpack 5 默认在开发环境下启用持久化缓存，若遇到缓存相关问题，可设置 enable: false 进行关闭。
+    enable: true // 开启 Webpack 5 持久化缓存，提升二次编译速度
   },
   mini: {
     postcss: {

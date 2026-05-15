@@ -66,16 +66,19 @@ export const useAppStore = create<AppState>()(
         if (!isLoggedIn) return
 
         try {
-          const { result } = await Taro.cloud.callFunction({ name: 'login' })
+          const { result } = await Taro.cloud.callFunction({ name: 'login', config: { timeout: 8000 } })
           if (result && (result as any).success) {
             set({ user: (result as any).user })
           }
-        } catch (e) {
-          console.error('login error', e)
+        } catch (e: any) {
+          console.error('[init] login 云函数调用失败:', e)
+          if (e?.errMsg?.includes('timeout') || e?.message?.includes('timeout')) {
+            get().showToast('请求超时：请检查云函数是否已部署')
+          }
         }
 
         try {
-          const { result } = await Taro.cloud.callFunction({ name: 'getHomeData' })
+          const { result } = await Taro.cloud.callFunction({ name: 'getHomeData', config: { timeout: 8000 } })
           const res = result as any
           if (res) {
             set({
@@ -86,36 +89,50 @@ export const useAppStore = create<AppState>()(
               weeklyStrip: res.weeklyStrip || [],
             })
           }
-        } catch (e) {
-          console.error('getHomeData error', e)
+        } catch (e: any) {
+          console.error('[init] getHomeData 云函数调用失败:', e)
+          if (e?.errMsg?.includes('timeout') || e?.message?.includes('timeout')) {
+            get().showToast('请求超时：请检查云函数是否已部署')
+          }
         }
       },
 
       login: async (userInfo = {}) => {
-        const { result } = await Taro.cloud.callFunction({
-          name: 'login',
-          data: userInfo,
-        })
-        const res = result as any
-        if (res && res.success) {
-          set({ user: res.user, isLoggedIn: true })
-          try {
-            const { result: homeResult } = await Taro.cloud.callFunction({ name: 'getHomeData' })
-            const homeRes = homeResult as any
-            if (homeRes) {
-              set({
-                todayStatus: homeRes.todayStatus,
-                todayCheckIn: homeRes.todayCheckIn,
-                streakDays: homeRes.streakDays,
-                goals: homeRes.goals,
-                weeklyStrip: homeRes.weeklyStrip || [],
-              })
+        try {
+          const { result } = await Taro.cloud.callFunction({
+            name: 'login',
+            data: userInfo,
+            config: { timeout: 8000 },
+          })
+          const res = result as any
+          if (res && res.success) {
+            set({ user: res.user, isLoggedIn: true })
+            try {
+              const { result: homeResult } = await Taro.cloud.callFunction({ name: 'getHomeData', config: { timeout: 8000 } })
+              const homeRes = homeResult as any
+              if (homeRes) {
+                set({
+                  todayStatus: homeRes.todayStatus,
+                  todayCheckIn: homeRes.todayCheckIn,
+                  streakDays: homeRes.streakDays,
+                  goals: homeRes.goals,
+                  weeklyStrip: homeRes.weeklyStrip || [],
+                })
+              }
+            } catch (e: any) {
+              console.error('[login] getHomeData 云函数调用失败:', e)
+              if (e?.errMsg?.includes('timeout') || e?.message?.includes('timeout')) {
+                get().showToast('请求超时：请检查云函数是否已部署')
+              }
             }
-          } catch (e) {
-            console.error('getHomeData error', e)
+          } else {
+            throw new Error('登录失败')
           }
-        } else {
-          throw new Error('登录失败')
+        } catch (e: any) {
+          if (e?.errMsg?.includes('timeout') || e?.message?.includes('timeout')) {
+            get().showToast('请求超时：请检查云函数是否已部署')
+          }
+          throw e
         }
       },
 
@@ -142,6 +159,7 @@ export const useAppStore = create<AppState>()(
         const { result } = await Taro.cloud.callFunction({
           name: 'updateUser',
           data,
+          config: { timeout: 8000 },
         })
         const res = result as any
         if (res && res.success) {
@@ -155,6 +173,7 @@ export const useAppStore = create<AppState>()(
         const { result } = await Taro.cloud.callFunction({
           name: 'addCheckIn',
           data,
+          config: { timeout: 8000 },
         })
         const res = result as any
         if (res && res.success) {
@@ -177,6 +196,7 @@ export const useAppStore = create<AppState>()(
         const { result } = await Taro.cloud.callFunction({
           name: 'getFeed',
           data: { page, pageSize: 10 },
+          config: { timeout: 8000 },
         })
         const res = result as any
         if (res) {
