@@ -37,7 +37,12 @@ const config = {
     }
   },
   framework: 'react',
-  compiler: 'webpack5',
+  compiler: {
+    type: 'webpack5',
+    prebundle: {
+      enable: false
+    }
+  },
   cache: {
     enable: true // 开启 Webpack 5 持久化缓存，提升二次编译速度
   },
