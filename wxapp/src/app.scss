@@ -1,0 +1,12 @@
+@import './styles/glass.scss';
+@import './styles/animations.scss';
+
+page {
+  background: #F4F9F6;
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #1A3C34;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar hide */
+::-webkit-scrollbar { display: none; }

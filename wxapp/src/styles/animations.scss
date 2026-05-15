@@ -1,0 +1,118 @@
+@keyframes float-glass-a {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(40px, 60px); }
+}
+@keyframes float-glass-b {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-30px, -40px); }
+}
+@keyframes float-glass-c {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, -30px); }
+}
+
+.animate-float-a { animation: float-glass-a 20s ease-in-out infinite alternate; }
+.animate-float-b { animation: float-glass-b 20s ease-in-out infinite alternate; }
+.animate-float-c { animation: float-glass-c 20s ease-in-out infinite alternate; }
+
+/* Stagger 入场 */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: stagger-in 0.5s ease forwards;
+}
+
+@for $i from 1 through 10 {
+  .stagger-item:nth-child(#{$i}) {
+    animation-delay: #{$i * 0.08}s;
+  }
+}
+
+@keyframes stagger-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  opacity: 0;
+  transition: all 0.25s ease;
+  pointer-events: none;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+
+  &.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 打卡庆祝 */
+.celebrate {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+
+  .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    animation: confetti-pop 0.8s ease-out forwards;
+
+    @for $i from 1 through 12 {
+      &:nth-child(#{$i}) {
+        background: hsl($i * 30, 80%, 60%);
+        transform: rotate($i * 30deg);
+        animation-delay: #{$i * 0.02}s;
+      }
+    }
+  }
+}
+
+@keyframes confetti-pop {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* 页面淡入 */
+.page-enter {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 卡片点击反馈 */
+.card-tap:active {
+  transform: scale(0.97);
+  transition: transform 0.15s;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-a,
+  .animate-float-b,
+  .animate-float-c,
+  .stagger-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
