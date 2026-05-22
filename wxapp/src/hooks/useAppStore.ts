@@ -15,13 +15,16 @@ interface AppState {
   feedPage: number
   feedHasMore: boolean
   toast: { message: string; visible: boolean } | null
+  userCheckIns: CheckIn[]
 
   init: () => Promise<void>
   login: (params?: { code?: string; nickName?: string; avatarUrl?: string }) => Promise<void>
   logout: () => void
   updateUser: (data: Partial<Pick<User, 'nickName' | 'avatarUrl' | 'mantra'>>) => Promise<void>
   checkIn: (data: AddCheckInRequest) => Promise<any>
+  deleteCheckIn: (checkInId: string) => Promise<any>
   loadFeed: (page?: number) => Promise<void>
+  loadUserCheckIns: () => Promise<void>
   showToast: (message: string) => void
   hideToast: () => void
 }
@@ -60,6 +63,8 @@ export const useAppStore = create<AppState>()(
       feedPage: 1,
       feedHasMore: true,
       toast: null,
+      userCheckIns: [],
+      loginExpiredAt: null,
 
       init: async () => {
         const { isLoggedIn } = get()
@@ -106,7 +111,7 @@ export const useAppStore = create<AppState>()(
           })
           const res = result as any
           if (res && res.success) {
-            set({ user: res.user, isLoggedIn: true })
+            set({ user: res.user, isLoggedIn: true, loginExpiredAt: Date.now() + 86400000 })
             try {
               const { result: homeResult } = await Taro.cloud.callFunction({ name: 'getHomeData', config: { timeout: 8000 } })
               const homeRes = homeResult as any
@@ -149,6 +154,7 @@ export const useAppStore = create<AppState>()(
           feedPage: 1,
           feedHasMore: true,
           toast: null,
+          loginExpiredAt: null,
         })
         try {
           Taro.clearStorageSync()
@@ -186,8 +192,43 @@ export const useAppStore = create<AppState>()(
             streakDays: res.streakDays,
             weeklyStrip: state.weeklyStrip.map(day => 
               day.date === todayStr ? { ...day, status: 'checked', category: data.category } : day
-            )
+            ),
+            feed: [],
+            feedPage: 1,
+            feedHasMore: true,
           }))
+        }
+        return res
+      },
+
+      deleteCheckIn: async (checkInId: string) => {
+        const { result } = await Taro.cloud.callFunction({
+          name: 'deleteCheckIn',
+          data: { checkInId },
+          config: { timeout: 8000 },
+        })
+        const res = result as any
+        if (res && res.success) {
+          set((state) => {
+            const deletedItem = state.feed.find((item) => item.checkIn._id === checkInId)
+            const deletedCheckIn = deletedItem?.checkIn
+            const isToday = deletedCheckIn
+              ? deletedCheckIn.date ===
+                `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`
+              : false
+
+            return {
+              feed: state.feed.filter((item) => item.checkIn._id !== checkInId),
+              userCheckIns: state.userCheckIns.filter((ci) => ci._id !== checkInId),
+              todayStatus: isToday ? 'pending' : state.todayStatus,
+              todayCheckIn: isToday ? null : state.todayCheckIn,
+              user: state.user
+                ? { ...state.user, totalCheckIns: Math.max(0, state.user.totalCheckIns - 1) }
+                : null,
+            }
+          })
+          // 重新拉取首页数据以同步 streakDays / goals / weeklyStrip
+          get().init()
         }
         return res
       },
@@ -205,6 +246,17 @@ export const useAppStore = create<AppState>()(
             feedPage: page,
             feedHasMore: res.hasMore,
           })
+        }
+      },
+
+      loadUserCheckIns: async () => {
+        const { result } = await Taro.cloud.callFunction({
+          name: 'getUserCheckIns',
+          config: { timeout: 8000 },
+        })
+        const res = result as any
+        if (res && res.success) {
+          set({ userCheckIns: res.list || [] })
         }
       },
 
@@ -231,6 +283,8 @@ export const useAppStore = create<AppState>()(
         goals: state.goals,
         weeklyStrip: state.weeklyStrip,
         feed: state.feed,
+        userCheckIns: state.userCheckIns,
+        loginExpiredAt: state.loginExpiredAt,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -240,6 +294,7 @@ export const useAppStore = create<AppState>()(
           if (!state.todayCheckIn) state.todayCheckIn = null
           if (!state.streakDays) state.streakDays = 0
           if (typeof state.isLoggedIn !== 'boolean') state.isLoggedIn = false
+          if (!state.loginExpiredAt) state.loginExpiredAt = null
         }
       },
     }

@@ -8,16 +8,14 @@ import MonthlyStats from '@/components/MonthlyStats'
 import Toast from '@/components/Toast'
 
 export default function StatsPage() {
-  const { user, todayCheckIn, streakDays, init } = useAppStore()
+  const { user, streakDays, userCheckIns, init, loadUserCheckIns } = useAppStore()
 
   useEffect(() => {
     init()
+    loadUserCheckIns()
   }, [])
 
   useRequireAuth()
-
-  // 简化：用 feed 或本地状态模拟月度数据
-  const mockCheckIns = todayCheckIn ? [todayCheckIn] : []
 
   return (
     <View style={{ height: '100vh', position: 'relative' }}>
@@ -30,11 +28,11 @@ export default function StatsPage() {
       >
         <View style={{ paddingTop: 12 }}>
           <MonthlyStats
-            checkIns={mockCheckIns}
+            checkIns={userCheckIns}
             streakDays={streakDays}
             totalCheckIns={user?.totalCheckIns || 0}
           />
-          <CalendarArchive checkIns={mockCheckIns} />
+          <CalendarArchive checkIns={userCheckIns} />
         </View>
       </ScrollView>
 

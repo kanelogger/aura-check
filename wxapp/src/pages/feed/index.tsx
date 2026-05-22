@@ -11,9 +11,7 @@ export default function FeedPage() {
   const safeFeed = feed || []
 
   useEffect(() => {
-    if (feed.length === 0) {
-      loadFeed(1)
-    }
+    loadFeed(1)
   }, [])
 
   useRequireAuth()

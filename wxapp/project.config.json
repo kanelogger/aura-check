@@ -5,8 +5,8 @@
   "description": "Aura Check 自律打卡小程序",
   "setting": {
     "urlCheck": true,
-    "es6": false,
-    "enhance": true,
+    "es6": true,
+    "enhance": false,
     "postcss": false,
     "preloadBackgroundData": false,
     "minified": false,
@@ -46,9 +46,18 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.4",
+  "libVersion": "3.16.0",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      { "type": "folder", "value": "esbuild" },
+      { "type": "folder", "value": "webpack" },
+      { "type": "folder", "value": "@babel" },
+      { "type": "folder", "value": "eslint" },
+      { "type": "folder", "value": "typescript" },
+      { "type": "folder", "value": "postcss" },
+      { "type": "folder", "value": "sass" },
+      { "type": "folder", "value": "stylelint" }
+    ],
     "include": []
   },
   "editorSetting": {

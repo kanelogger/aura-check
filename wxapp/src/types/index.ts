@@ -87,3 +87,13 @@ export interface GetFeedResponse {
   list: FeedItem[]
   hasMore: boolean
 }
+
+export interface DeleteCheckInResponse {
+  success: boolean
+  deletedId?: string
+  deletedDate?: string
+  isToday?: boolean
+  streakDays?: number
+  category?: Category
+  message?: string
+}

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { View, Text, ScrollView } from '@tarojs/components'
 import { useAppStore } from '@/hooks/useAppStore'
 import { useRequireAuth } from '@/hooks/useRequireAuth'
@@ -23,6 +23,10 @@ export default function HomePage() {
   useEffect(() => {
     init()
   }, [])
+
+  useDidShow(() => {
+    init()
+  })
 
   useRequireAuth()
 

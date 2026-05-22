@@ -24,6 +24,25 @@ exports.main = async (event) => {
     }
   }
 
+  // 1.5 图片安全校验
+  if (photoUrl) {
+    try {
+      const downloadRes = await cloud.downloadFile({ fileID: photoUrl })
+      const buffer = downloadRes.fileContent
+      const imgRes = await cloud.openapi.security.imgSecCheck({
+        media: {
+          contentType: 'image/jpeg',
+          value: buffer,
+        },
+      })
+      if (imgRes.result.suggest !== 'pass') {
+        return { success: false, message: '图片包含违规内容' }
+      }
+    } catch (e) {
+      // 继续执行，不阻塞
+    }
+  }
+
   const today = getTodayStr()
 
   // 2. 查今日是否已打卡（同一 category）
